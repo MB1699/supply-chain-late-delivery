@@ -1,0 +1,5 @@
+catalog: supply_chain
+landing_path: /Volumes/supply_chain/landing/raw_files
+source_file: DataCoSupplyChainDataset.csv
+encoding: latin-1
+batch_size: 20000
