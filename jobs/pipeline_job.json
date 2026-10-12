@@ -1,0 +1,131 @@
+{
+  "name": "supply_chain_daily_pipeline",
+  "email_notifications": {
+    "on_success": [
+      "muskan.work1216@gmail.com"
+    ],
+    "on_failure": [
+      "muskan.work1216@gmail.com"
+    ],
+    "no_alert_for_skipped_runs": false
+  },
+  "webhook_notifications": {},
+  "notification_settings": {
+    "no_alert_for_skipped_runs": false,
+    "no_alert_for_canceled_runs": false
+  },
+  "timeout_seconds": 0,
+  "schedule": {
+    "quartz_cron_expression": "39 0 14 * * ?",
+    "timezone_id": "America/New_York",
+    "pause_status": "UNPAUSED"
+  },
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "simulate_feed",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "notebooks/01a_simulate_feed",
+        "base_parameters": {
+          "batches_to_release": "1"
+        },
+        "source": "GIT"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "environment_key": "Default",
+      "disabled": false
+    },
+    {
+      "task_key": "bronze_ingestion",
+      "depends_on": [
+        {
+          "task_key": "simulate_feed"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "notebooks/01_bronze_ingestion",
+        "source": "GIT"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "environment_key": "Default",
+      "disabled": false
+    },
+    {
+      "task_key": "silver_cleaning",
+      "depends_on": [
+        {
+          "task_key": "bronze_ingestion"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "notebooks/02_silver_cleaning",
+        "source": "GIT"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "environment_key": "Default",
+      "disabled": false
+    },
+    {
+      "task_key": "gold_star_schema",
+      "depends_on": [
+        {
+          "task_key": "silver_cleaning"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "notebooks/03_gold_star_schema",
+        "source": "GIT"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "environment_key": "Default",
+      "disabled": false
+    },
+    {
+      "task_key": "inventory_sim",
+      "depends_on": [
+        {
+          "task_key": "gold_star_schema"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "notebooks/04_gold_inventory_sim",
+        "source": "GIT"
+      },
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "environment_key": "Default",
+      "disabled": false
+    }
+  ],
+  "git_source": {
+    "git_url": "https://github.com/MB1699/supply-chain-late-delivery",
+    "git_provider": "gitHub",
+    "git_branch": "dev"
+  },
+  "queue": {
+    "enabled": true
+  },
+  "environments": [
+    {
+      "environment_key": "Default",
+      "spec": {
+        "environment_version": "6"
+      }
+    }
+  ],
+  "performance_target": "PERFORMANCE_OPTIMIZED"
+}
