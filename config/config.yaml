@@ -3,3 +3,10 @@ landing_path: /Volumes/supply_chain/landing/raw_files
 source_file: DataCoSupplyChainDataset.csv
 encoding: latin-1
 batch_size: 20000
+
+
+inventory:
+  lead_time_weeks: 1       # an order arrives 1 week after it's placed
+  safety_weeks: 0.5        # extra buffer = half a week of average demand
+  initial_cover_weeks: 2   # starting stock = 2 weeks of demand
+  avg_window_weeks: 4      # "average demand" = last 4 weeks
