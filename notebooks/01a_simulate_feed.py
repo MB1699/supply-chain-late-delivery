@@ -53,4 +53,4 @@ for name in to_release:
     dbutils.fs.mv(f"{STAGING}/{name}", f"{INCOMING}/{name}")
     print(f"Released: {name}")
 
-print(f"Pending: {len(pending) - len(ti_release)} | Delivered so far: {len(os.listdir(INCOMING))}")
+print(f"Pending: {len(pending) - len(to_release)} | Delivered so far: {len(os.listdir(INCOMING))}")
