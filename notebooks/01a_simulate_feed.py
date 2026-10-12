@@ -35,8 +35,8 @@ if not os.listdir(STAGING) and not os.listdir(INCOMING):
 
     size = cfg["batch_size"]
     for i, start in enumerate(range(0, len(df), size)):
-        df.iloc[start:start + size].to_cvs(
-            f"{STAGING}/batch_{i:03d}.cvs", index=False, encoding="utf-8"
+        df.iloc[start:start + size].to_csv(
+            f"{STAGING}/batch_{i:03d}.csv", index=False, encoding="utf-8"
         )
     print(f"Source rows: {len(df):,} -> split into {i + 1} batches")
 else:
