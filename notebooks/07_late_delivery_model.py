@@ -250,11 +250,11 @@ print("Saved:", f"{G}.late_risk_predictions", f"({len(out):,} rows)")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Conclusions (fill in after running)
+# MAGIC ## Conclusions
 # MAGIC | Question | Answer |
 # MAGIC |---|---|
-# MAGIC | Best model overall (ROC-AUC / PR-AUC) | ___ |
-# MAGIC | Gain over shipping-mode rule | ___ |
-# MAGIC | AUC within each mode | ___ (≈0.5 means no extra signal) |
-# MAGIC | Top features | ___ |
-# MAGIC | So what? | ___ |
+# MAGIC | Best model overall (ROC-AUC / PR-AUC) | **XGBoost**: ROC-AUC 0.775, PR-AUC 0.856 (test set: 22,947 orders, 2017+) |
+# MAGIC | Gain over shipping-mode rule | Small: +0.03 ROC-AUC (0.743 → 0.775), +0.07 PR-AUC (0.784 → 0.856). The simple rule already captures most of the signal |
+# MAGIC | AUC within each mode | Second Class 0.50, Standard Class 0.50 (no extra signal). **Same Day 1.00**: all of the model's gain comes from Same Day orders (cause under investigation: likely an order-hour cutoff) |
+# MAGIC | Top features | `scheduled_days` and `shipping_mode` dominate (~83% of importance). Next is `order_hour`; region and category add almost nothing |
+# MAGIC | So what? | Lateness is driven by **what each shipping mode promises**, not by order details. For Second and Standard Class, lateness can't be predicted from order-time data. **Main recommendation: reset delivery promises** (e.g., First Class to 2 days). Use the model mainly to flag risky Same Day orders |
