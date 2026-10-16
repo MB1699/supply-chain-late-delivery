@@ -247,7 +247,7 @@ spark.createDataFrame(out).write.mode("overwrite").option("overwriteSchema", "tr
     .saveAsTable(f"{G}.late_risk_predictions")
 print("Saved:", f"{G}.late_risk_predictions", f"({len(out):,} rows)")
 
-# COMMAND ----------
+# COMMAND --------
 
 # MAGIC %md
 # MAGIC ## Conclusions
