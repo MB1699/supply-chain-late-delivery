@@ -10,3 +10,13 @@ inventory:
   safety_weeks: 0.5        # extra buffer = half a week of average demand
   initial_cover_weeks: 2   # starting stock = 2 weeks of demand
   avg_window_weeks: 4      # "average demand" = last 4 weeks
+
+
+  risk_tiers:
+  high: 0.75     # late risk >= 75% → High
+  medium: 0.50   # 50–75% → Medium, below → Low
+
+cost_assumptions:            # ILLUSTRATIVE assumptions, not from the data
+  late_order_cost: 15        # $ lost per late order (credits, support, churn risk)
+  expedite_cost: 8           # $ to speed up one order
+  expedite_effectiveness: 0.6  # share of late orders that speeding up actually saves
