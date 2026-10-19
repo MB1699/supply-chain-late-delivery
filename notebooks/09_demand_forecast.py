@@ -219,13 +219,14 @@ print("Updated:", f"{G}.inventory_sim_weekly")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Conclusions (fill in after running)
+# MAGIC ## Conclusions
 # MAGIC | Question | Answer |
 # MAGIC |---|---|
-# MAGIC | Best forecasting method (WAPE) | ___ |
-# MAGIC | Improvement vs naive | ___ |
-# MAGIC | Bias (over / under forecasting) | ___ |
-# MAGIC | Inventory: fill rate naive vs forecast | ___ → ___ |
-# MAGIC | Inventory: lost units naive vs forecast | ___ → ___ |
-# MAGIC | Inventory: weeks of cover naive vs forecast | ___ → ___ |
-# MAGIC | **So what?** | ___ |
+# MAGIC | Best forecasting method (WAPE) | **SES**: 10.5% WAPE, wins 14 of 25 categories |
+# MAGIC | Improvement vs naive | 22% lower error (13.5% → 10.5%). Same-week-last-year is worse (no seasonality) |
+# MAGIC | Bias | +0.5%, essentially unbiased |
+# MAGIC | Inventory: fill rate naive vs forecast | 99.97% → 99.97% (no change) |
+# MAGIC | Inventory: lost units naive vs forecast | 27 → 32 (no meaningful difference) |
+# MAGIC | Inventory: avg stock naive vs forecast | 184.8 → 182.4 (−1%); orders ~7% steadier |
+# MAGIC | Safety stock test | Cutting the buffer from 0.5 to 0 weeks reduces stock **32%** with fill rate 99.97% → 99.89%, for both policies |
+# MAGIC | **So what?** | Demand is flat with small noise, so a better forecast barely changes inventory outcomes. **The biggest saving is reducing the safety buffer** (illustrative, simulated). Forecasting would matter more with trends, seasonality, or promotions |
