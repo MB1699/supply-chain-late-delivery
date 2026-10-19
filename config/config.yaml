@@ -18,3 +18,10 @@ cost_assumptions:              # ILLUSTRATIVE assumptions, not from the data
   late_order_cost: 15          # $ lost per late order (credits, support, churn risk)
   expedite_cost: 8             # $ to speed up one order
   expedite_effectiveness: 0.6  # share of late orders that speeding up actually saves
+
+forecast:
+  data_start: "2015-01-05"   # first full week (Monday)
+  data_end: "2017-09-24"     # last full week before the Oct-2017 volume drop
+  test_start: "2017-01-01"   # backtest: forecast 2017 weeks using only past data
+  min_train_weeks: 52        # need at least 1 year of history
+  horizon_weeks: 13          # future forecast ~3 months
