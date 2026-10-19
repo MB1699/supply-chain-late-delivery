@@ -237,13 +237,14 @@ print("Saved: order_risk_scores, expedite_policy_comparison, promise_what_if")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Conclusions (fill in after running)
+# MAGIC ## Conclusions
 # MAGIC | Question | Answer |
 # MAGIC |---|---|
-# MAGIC | High tier: share of orders / actual late rate | ___ |
-# MAGIC | Low tier: actual late rate | ___ |
-# MAGIC | Top SHAP drivers | ___ |
-# MAGIC | Best expedite policy (net savings) | ___ |
-# MAGIC | Break-even risk | ___ |
-# MAGIC | Late rate if promises are fixed | ___% → ___% |
-# MAGIC | **Recommendation** | ___ |
+# MAGIC | High tier: share of orders / actual late rate | 35.9% of orders, 90.0% actually late, capturing 56.5% of all late orders |
+# MAGIC | Low tier: actual late rate | 37.6%. Mostly Standard Class, whose lateness isn't predictable from order-time data |
+# MAGIC | Top SHAP drivers | shipping_mode (dominant), scheduled_days, order_hour. All other features near zero |
+# MAGIC | Same Day finding | Late-evening orders (~7–9 PM) are late; early-morning orders (~2–3 AM) on time → cutoff-time pattern |
+# MAGIC | Best expedite policy (net savings) | Cost rule: +$4,120 (4,156 orders, ≈ First Class + late-evening Same Day). Expedite-all loses $65,496 |
+# MAGIC | Break-even risk | 0.889 at $15/late order. Expediting never pays at ≤ $10; ~$46K at $25; ~$135K at $40 |
+# MAGIC | Late rate if promises are fixed | 57.3% → ~34% (First Class 1→2 days, Second Class 2→4 days) |
+# MAGIC | **Recommendation** | 1) **Reset delivery promises** to match actual performance (biggest impact, no extra cost). 2) Add a **Same Day order cutoff time**. 3) Expedite only above the break-even risk, once the real cost of a late order is known. All costs here are illustrative |
