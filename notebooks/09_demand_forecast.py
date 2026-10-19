@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # 09 - Demand forecasting + forecast-based inventory
 # MAGIC 1. Backtest 5 weekly forecasting methods per category (forecast 2017 using only past data).
@@ -170,6 +174,35 @@ comparison["fill_rate"] = (comparison.total_sold / comparison.total_demand).roun
 comparison["weeks_of_cover"] = (comparison.avg_stock / comparison.avg_weekly_demand).round(2)
 comparison = comparison.round(4).reset_index()
 display(comparison)
+
+# COMMAND ----------
+
+# 1) Order stability: how much do weekly orders swing? (lower CV = steadier orders for suppliers)
+display(
+    sims.groupby("policy").order_qty.agg(["mean", "std"])
+        .assign(cv=lambda x: (x["std"] / x["mean"]).round(3))
+        .round(1).reset_index()
+)
+
+# 2) Can the better forecast run on LESS safety stock?
+rows = []
+for sw in [0.0, 0.25, 0.5]:
+    for policy, m in POLICIES.items():
+        lost = dem = stock = n = 0
+        for key, s in series.items():
+            fcs, _, start = cache[key]
+            sim = simulate_inventory(
+                s.values[start:], fcs[m][start:],
+                lead_time=INV["lead_time_weeks"], safety_weeks=sw,
+                initial_cover_weeks=INV["initial_cover_weeks"], avg_window=INV["avg_window_weeks"],
+            )
+            lost += sim.lost_sales.sum(); dem += sim.demand.sum()
+            stock += sim.closing_stock.sum(); n += len(sim)
+        rows.append({"safety_weeks": sw, "policy": policy,
+                     "fill_rate": round(1 - lost / dem, 4),
+                     "lost_units": int(lost),
+                     "avg_stock": round(stock / n, 1)})
+display(pd.DataFrame(rows).sort_values(["safety_weeks", "policy"]))
 
 # COMMAND ----------
 
