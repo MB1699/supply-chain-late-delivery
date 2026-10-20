@@ -1,0 +1,1524 @@
+{
+  "datasets": [
+    {
+      "name": "ec0e3136",
+      "displayName": "orders",
+      "queryLines": [
+        "SELECT * FROM supply_chain.gold.vw_orders"
+      ]
+    },
+    {
+      "name": "734d06f7",
+      "displayName": "scored_orders",
+      "queryLines": [
+        "   SELECT *\r\n",
+        "   FROM supply_chain.gold.vw_orders\r\n",
+        "   WHERE risk_tier IS NOT NULL\r\n",
+        "   ORDER BY late_risk DESC"
+      ]
+    },
+    {
+      "name": "22df88fc",
+      "displayName": "promise_what_if",
+      "queryLines": [
+        "SELECT * FROM supply_chain.gold.vw_promise_what_if"
+      ]
+    },
+    {
+      "name": "510a1ab1",
+      "displayName": "expedite_policies",
+      "queryLines": [
+        "SELECT policy, orders_expedited, late_orders_avoided, expedite_spend, late_cost_saved, net_savings FROM supply_chain.gold.expedite_policy_comparison"
+      ]
+    },
+    {
+      "name": "3b922b50",
+      "displayName": "forecast_backtest",
+      "queryLines": [
+        "SELECT * FROM supply_chain.gold.vw_forecast_backtest"
+      ]
+    },
+    {
+      "name": "dfc36f1b",
+      "displayName": "forecast_metrics",
+      "queryLines": [
+        "SELECT method, wape, bias, improvement_vs_naive FROM supply_chain.gold.forecast_metrics"
+      ]
+    },
+    {
+      "name": "fc400584",
+      "displayName": "inventory_comparison",
+      "queryLines": [
+        "SELECT policy, fill_rate, lost_units, stockout_week_rate, avg_stock, weeks_of_cover FROM supply_chain.gold.inventory_policy_comparison"
+      ]
+    },
+    {
+      "name": "fe5521ca",
+      "displayName": "future_forecast",
+      "queryLines": [
+        "SELECT category_name, ROUND(AVG(forecast_units), 1) AS weekly_forecast_units FROM supply_chain.gold.demand_forecast_future GROUP BY category_name"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "ae604e76",
+      "displayName": "Executive",
+      "layout": [
+        {
+          "widget": {
+            "name": "delivers-orders",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "countdistinct(order_id)",
+                      "expression": "COUNT(DISTINCT `order_id`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Delivered orders\n<p>&nbsp;</p>\n",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(order_id)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "late-rate",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "avg(is_late)",
+                      "expression": "AVG(`is_late`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Late Rate\n<p>&nbsp;</p>\n",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(is_late)",
+                  "formatTemplate": "{{ @formatted }}",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 3,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "avg-delay-when-late",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "avg(delay_if_late)",
+                      "expression": "AVG(`delay_if_late`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Avg delay when late(days)\n<p>&nbsp;</p>\n",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(delay_if_late)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 3,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "revenue-late-orders",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "sum(late_sales)",
+                      "expression": "SUM(`late_sales`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Revenue on late orders ",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(late_sales)",
+                  "format": {
+                    "type": "number-currency",
+                    "currencyCode": "USD",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 7,
+            "y": 3,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "late-rate-by-shipping-mode",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "avg(is_late)",
+                      "expression": "AVG(`is_late`)"
+                    },
+                    {
+                      "name": "shipping_mode",
+                      "expression": "`shipping_mode`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Late rate by shipping mode",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "avg(is_late)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "shipping_mode",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "laterate-if-promises-match-delivery",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "22df88fc",
+                  "fields": [
+                    {
+                      "name": "scenario",
+                      "expression": "`scenario`"
+                    },
+                    {
+                      "name": "shipping_mode",
+                      "expression": "`shipping_mode`"
+                    },
+                    {
+                      "name": "sum(late_rate)",
+                      "expression": "SUM(`late_rate`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Late rate if promises match actual delivery",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "mark": {
+                "layout": "group"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "shipping_mode",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(late_rate)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "scenario",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 5,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "late-rate-by-month-1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "monthly(order_date)",
+                      "expression": "DATE_TRUNC(\"MONTH\", `order_date`)"
+                    },
+                    {
+                      "name": "avg(is_late)",
+                      "expression": "AVG(`is_late`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Late rate by month",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "monthly(order_date)",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(is_late)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 11,
+            "width": 12,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "9e8735c7",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# <span style=\"text-align:center;display:block;\">Delivery Performance Overview</span>\n",
+                "\n",
+                "<span style=\"text-align:center;display:block;\">Delivered orders, 2015–2018 · DataCo (academic dataset)</span>\n",
+                "\n",
+                "<span style=\"text-align:center;display:block;\">**Key finding:** lateness is driven by shipping-mode promises. Resetting First Class to 2 days and Second Class to 4 days would cut the late rate from **57% to \\~34%**.</span>"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "025f2905",
+            "queries": [
+              {
+                "name": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a1a0f102cb0c444d2b9b7db4b_market",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "market",
+                      "expression": "`market`"
+                    },
+                    {
+                      "name": "market_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "market",
+                    "queryName": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a1a0f102cb0c444d2b9b7db4b_market"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 3,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "ca624b57",
+            "queries": [
+              {
+                "name": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a1a0f102cb0c444d2b9b7db4b_order_date",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "order_date",
+                      "expression": "`order_date`"
+                    },
+                    {
+                      "name": "order_date_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "order_date",
+                    "queryName": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a1a0f102cb0c444d2b9b7db4b_order_date"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 10,
+            "y": 3,
+            "width": 2,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "c0aec3a7",
+      "displayName": "Operations",
+      "layout": [
+        {
+          "widget": {
+            "name": "orders-by-risk-tier",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "risk_tier",
+                      "expression": "`risk_tier`"
+                    },
+                    {
+                      "name": "countdistinct(order_id)",
+                      "expression": "COUNT(DISTINCT `order_id`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Orders by risk tier\n<p>&nbsp;</p>\n",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "risk_tier",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "countdistinct(order_id)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "risk_tier",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "actual-late-rate-by-risk-tier",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "risk_tier",
+                      "expression": "`risk_tier`"
+                    },
+                    {
+                      "name": "avg(is_late)",
+                      "expression": "AVG(`is_late`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Actual late rate by risk tier",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "risk_tier",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(is_late)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 1,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "risk-tier-shipping-mode",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "shipping_mode",
+                      "expression": "`shipping_mode`"
+                    },
+                    {
+                      "name": "risk_tier",
+                      "expression": "`risk_tier`"
+                    },
+                    {
+                      "name": "countdistinct(order_id)",
+                      "expression": "COUNT(DISTINCT `order_id`)"
+                    }
+                  ],
+                  "cubeGroupingSets": {
+                    "sets": [
+                      {
+                        "fieldNames": [
+                          "shipping_mode"
+                        ]
+                      },
+                      {
+                        "fieldNames": [
+                          "risk_tier"
+                        ]
+                      }
+                    ]
+                  },
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "ASC",
+                      "expression": "`shipping_mode`"
+                    },
+                    {
+                      "direction": "ASC",
+                      "expression": "`risk_tier`"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Risk tier by shipping mode",
+                  "fields": []
+                }
+              },
+              "version": 4,
+              "widgetType": "pivot",
+              "encodings": {
+                "rows": {
+                  "fields": [
+                    {
+                      "fieldName": "shipping_mode",
+                      "scale": {
+                        "type": "categorical"
+                      }
+                    }
+                  ]
+                },
+                "columns": {
+                  "fields": [
+                    {
+                      "fieldName": "risk_tier",
+                      "scale": {
+                        "type": "categorical"
+                      }
+                    }
+                  ]
+                },
+                "cells": {
+                  "fields": [
+                    {
+                      "fieldName": "countdistinct(order_id)",
+                      "cellType": "text"
+                    }
+                  ],
+                  "displayAs": "rows"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 7,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "orders-act-top-reasons-shap",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "order_id",
+                      "expression": "`order_id`"
+                    },
+                    {
+                      "name": "order_date",
+                      "expression": "`order_date`"
+                    },
+                    {
+                      "name": "shipping_mode",
+                      "expression": "`shipping_mode`"
+                    },
+                    {
+                      "name": "order_region",
+                      "expression": "`order_region`"
+                    },
+                    {
+                      "name": "risk_tier",
+                      "expression": "`risk_tier`"
+                    },
+                    {
+                      "name": "late_risk",
+                      "expression": "`late_risk`"
+                    },
+                    {
+                      "name": "top_reasons",
+                      "expression": "`top_reasons`"
+                    },
+                    {
+                      "name": "expedite",
+                      "expression": "`expedite`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Orders to act on (top reasons from SHAP)",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "order_id"
+                  },
+                  {
+                    "fieldName": "order_date"
+                  },
+                  {
+                    "fieldName": "shipping_mode"
+                  },
+                  {
+                    "fieldName": "order_region"
+                  },
+                  {
+                    "fieldName": "risk_tier"
+                  },
+                  {
+                    "fieldName": "late_risk",
+                    "format": {
+                      "type": "number-percent",
+                      "decimalPlaces": {
+                        "type": "exact",
+                        "places": 2
+                      },
+                      "hideGroupSeparator": true
+                    }
+                  },
+                  {
+                    "fieldName": "top_reasons"
+                  },
+                  {
+                    "fieldName": "expedite",
+                    "style": {
+                      "type": "basic",
+                      "rules": [
+                        {
+                          "condition": {
+                            "operator": "="
+                          },
+                          "backgroundColor": "#00A972"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 7,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "net-savings-expedite-policy-illustrative-costs",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "510a1ab1",
+                  "fields": [
+                    {
+                      "name": "sum(net_savings)",
+                      "expression": "SUM(`net_savings`)"
+                    },
+                    {
+                      "name": "policy",
+                      "expression": "`policy`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Net savings bby expedite policy(illustrative costs)",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(net_savings)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "policy",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "b19f4a87",
+            "queries": [
+              {
+                "name": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a1a0f102cb0c444d2b9b7db4b_risk_tier",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "risk_tier",
+                      "expression": "`risk_tier`"
+                    },
+                    {
+                      "name": "risk_tier_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true
+              },
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "risk_tier",
+                    "queryName": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a1a0f102cb0c444d2b9b7db4b_risk_tier"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 4,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "b2a0e72b",
+            "multilineTextboxSpec": {
+              "lines": [
+                "**Key finding:** High-tier orders are 90% late. Expediting pays only above \\~89% risk at $15 per late order, so fixing delivery promises comes first."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 13,
+            "width": 12,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "9a6af251",
+            "queries": [
+              {
+                "name": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a1a0f102cb0c444d2b9b7db4b_order_region",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "order_region",
+                      "expression": "`order_region`"
+                    },
+                    {
+                      "name": "order_region_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true
+              },
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "order_region",
+                    "queryName": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a1a0f102cb0c444d2b9b7db4b_order_region"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 4,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "74775e10",
+            "queries": [
+              {
+                "name": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a1a0f102cb0c444d2b9b7db4b_shipping_mode",
+                "query": {
+                  "datasetName": "ec0e3136",
+                  "fields": [
+                    {
+                      "name": "shipping_mode",
+                      "expression": "`shipping_mode`"
+                    },
+                    {
+                      "name": "shipping_mode_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true
+              },
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "shipping_mode",
+                    "queryName": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a1a0f102cb0c444d2b9b7db4b_shipping_mode"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 1
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "27ab6289",
+      "displayName": "Forecast & Inventory",
+      "layout": [
+        {
+          "widget": {
+            "name": "weekly-demand-actual-vs-forecast-2017-backtest",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "3b922b50",
+                  "fields": [
+                    {
+                      "name": "series",
+                      "expression": "`series`"
+                    },
+                    {
+                      "name": "weekly(week_start)",
+                      "expression": "DATE_TRUNC(\"WEEK\", `week_start`)"
+                    },
+                    {
+                      "name": "sum(units)",
+                      "expression": "SUM(`units`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Weekly demand: actual vs forecast(2017 backtest)",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "weekly(week_start)",
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(units)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "series",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "forecast-error-method-wape-lower-better",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dfc36f1b",
+                  "fields": [
+                    {
+                      "name": "sum(wape)",
+                      "expression": "SUM(`wape`)"
+                    },
+                    {
+                      "name": "method",
+                      "expression": "`method`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Forecast error by method(WAPE, lower is better)",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(wape)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "method",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 1,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "inventory-naive-vs-forecast-restocking-simulated",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "fc400584",
+                  "fields": [
+                    {
+                      "name": "policy",
+                      "expression": "`policy`"
+                    },
+                    {
+                      "name": "fill_rate",
+                      "expression": "`fill_rate`"
+                    },
+                    {
+                      "name": "lost_units",
+                      "expression": "`lost_units`"
+                    },
+                    {
+                      "name": "stockout_week_rate",
+                      "expression": "`stockout_week_rate`"
+                    },
+                    {
+                      "name": "avg_stock",
+                      "expression": "`avg_stock`"
+                    },
+                    {
+                      "name": "weeks_of_cover",
+                      "expression": "`weeks_of_cover`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Inventory: naive vs forecast restocking (simulated)",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "policy"
+                  },
+                  {
+                    "fieldName": "fill_rate"
+                  },
+                  {
+                    "fieldName": "lost_units"
+                  },
+                  {
+                    "fieldName": "stockout_week_rate"
+                  },
+                  {
+                    "fieldName": "avg_stock"
+                  },
+                  {
+                    "fieldName": "weeks_of_cover"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "forecast-weekly-units-next-3-months",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "fe5521ca",
+                  "fields": [
+                    {
+                      "name": "sum(weekly_forecast_units)",
+                      "expression": "SUM(`weekly_forecast_units`)"
+                    },
+                    {
+                      "name": "category_name",
+                      "expression": "`category_name`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Forecast weekly unites, next \\~3 months",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(weekly_forecast_units)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "category_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 7,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "d9fa05b4",
+            "queries": [
+              {
+                "name": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a56851d098a3bcecb84064a0b_category_name",
+                "query": {
+                  "datasetName": "3b922b50",
+                  "fields": [
+                    {
+                      "name": "category_name",
+                      "expression": "`category_name`"
+                    },
+                    {
+                      "name": "category_name_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "Cleats"
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "category_name",
+                    "queryName": "dashboards/01f1cc198fd01d9e8bb0badcba3c00c6/datasets/01f1cc1a56851d098a3bcecb84064a0b_category_name"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "69d91c3d",
+            "multilineTextboxSpec": {
+              "lines": [
+                "**Key finding:** exponential smoothing cut forecast error 22% vs naive, but with flat demand it didn't change stockouts. Removing the safety buffer cut simulated stock by 32% with fill rate still 99.9%."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 6,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
