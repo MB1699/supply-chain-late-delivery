@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # 10 - Dashboard views
 # MAGIC Clean, chart-ready views on top of Gold for the AI/BI dashboard.
